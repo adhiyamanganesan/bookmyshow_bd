@@ -21,3 +21,18 @@ class myuser(Document):
     mobile_no = StringField()
     email = StringField()
     ticket = ListField(EmbeddedDocumentField(ticket_history))
+
+class theatre_detail(EmbeddedDocument):
+    id = ObjectIdField()
+    screen_name=StringField()
+    pathway = StringField()
+    seating_details = ListField()
+
+class admin_user(Document):
+    firstname = StringField()
+    lastname = StringField()
+    password = StringField()
+    mobile_no = StringField()
+    email = StringField()
+    role = StringField()
+    theatre_details = ListField(EmbeddedDocumentField(theatre_detail))

@@ -101,3 +101,82 @@ def seating_details():
             for k in j.ticket_number:
                 data.append(k)
     return data
+
+######################################## admin ###################################################
+
+def admin_reg():
+    firstname = request.form["firstname"]
+    lastname = request.form["lastname"]
+    password = request.form["password"]
+    mobile_no = request.form["mobile_no"]
+    email = request.form["email"]
+    data = admin_user(
+        firstname = firstname,
+        lastname = lastname,
+        password = password,
+        mobile_no = mobile_no,
+        role = "admin",
+        email = email,
+    )
+    data.save()
+    return {"message":"your successfully register"}
+
+def theatre_details(user_id):
+    json_data = request.get_json()
+    admin_users = admin_user.objects(id=user_id).first()
+    data = theatre_detail(
+        id=ObjectId(),
+        screen_name = json_data["screen_name"],
+        pathway = json_data['pathway'],
+        
+    )
+    data.seating_details.append(json_data['seating_details'])
+    admin_users.theatre_details.append(data)
+    admin_users.save()
+    return {"message":"Theatre Details saved succefully"}
+
+def theatre_details_show(user_id = None):
+    user = admin_user.objects(id=user_id).first()
+    data = []
+    d = []
+    for i in user.theatre_details:
+        t_data = {
+            "id":str(i.id),
+            "screen_name":i.screen_name,
+            "pathway":i.pathway,
+            "seating_details":i.seating_details
+        }
+        d.append(t_data)
+    detail = {
+        "id":str(user.id),
+        "firstname":user.firstname,
+        "lastname":user.lastname,
+        "password":user.password,
+        "mobile_no":user.mobile_no,
+        "email":user.email,
+        "role":user.role,
+        "theatre_details" : d
+    }
+    data.append(detail)
+    return data
+
+def edit_admin_user(user_id):
+    user = admin_user.objects(id=user_id).first()
+    firstname = request.form["firstname"]
+    lastname = request.form["lastname"]
+    password = request.form["password"]
+    mobile_no = request.form["mobile_no"]
+    email = request.form["email"]
+    
+    data = {
+        "firstname" :firstname,
+        "lastname" :lastname,
+        "password" : password,
+        "mobile_no" : mobile_no,
+        "email" : email
+    }
+    
+    for key, value in data.items():
+        if value not in ["null", "undefined", None, ["null"], ""]:
+            admin_user.objects(id=user_id).update(**{"set__" + key: value})
+    return {"mesaage":"your data successfully update"}

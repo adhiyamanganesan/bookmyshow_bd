@@ -13,3 +13,13 @@ appbuilder.app.add_url_rule("/history/<user_id>", methods=["POST"],view_func=his
 appbuilder.app.add_url_rule("/cancel_ticket/<user_id>", methods=["POST"],view_func=cancel_ticket)
 
 appbuilder.app.add_url_rule("/seating_details", methods=["POST"],view_func=seating_details)
+
+############################################ admin ######################################################
+
+appbuilder.app.add_url_rule("/admin_reg", methods=["POST"],view_func=admin_reg)
+
+appbuilder.app.add_url_rule("/theatre_details/<user_id>", methods=["POST"],view_func=theatre_details)
+
+appbuilder.app.add_url_rule("/theatre_details_show/<user_id>", methods=["POST"],view_func=theatre_details_show)
+
+appbuilder.app.add_url_rule("/edit_admin_user/<user_id>", methods=["POST"],view_func=edit_admin_user)
