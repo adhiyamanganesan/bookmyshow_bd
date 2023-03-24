@@ -23,3 +23,5 @@ appbuilder.app.add_url_rule("/theatre_details/<user_id>", methods=["POST"],view_
 appbuilder.app.add_url_rule("/theatre_details_show/<user_id>", methods=["POST"],view_func=theatre_details_show)
 
 appbuilder.app.add_url_rule("/edit_admin_user/<user_id>", methods=["POST"],view_func=edit_admin_user)
+
+appbuilder.app.add_url_rule("/edit_admin_user/<user_id>/<theatre_id>", methods=["POST"],view_func=edit_admin_user)

@@ -127,25 +127,45 @@ def theatre_details(user_id):
     data = theatre_detail(
         id=ObjectId(),
         screen_name = json_data["screen_name"],
-        pathway = json_data['pathway'],
+        no_of_pathway = json_data['no_of_pathway'],
+        pathway_details =json_data['pathway_details']
         
     )
-    data.seating_details.append(json_data['seating_details'])
+    for i in json_data['seating_details']:
+        seat_data = seat_details(
+            id=ObjectId(),
+            type_of_seating =json_data['seating_details'][i]['type_of_seating'],
+            no_of_seats=json_data['seating_details'][i]['no_of_seats'],
+            no_of_row = json_data['seating_details'][i]['no_of_row'],
+            seats_number_row_wise = json_data['seating_details'][i]['seats_number_row_wise']
+        )
+        data.seating_details.append(seat_data)
     admin_users.theatre_details.append(data)
     admin_users.save()
-    return {"message":"Theatre Details saved succefully"}
+    return {"message":"Theatre Details saved successfully"}
 
 def theatre_details_show(user_id = None):
     user = admin_user.objects(id=user_id).first()
     data = []
     d = []
     for i in user.theatre_details:
+        seat_data = []
         t_data = {
             "id":str(i.id),
             "screen_name":i.screen_name,
-            "pathway":i.pathway,
-            "seating_details":i.seating_details
+            "no_of_pathway ":i.no_of_pathway,
+            "pathway_details":i.pathway_details,
+            "seating_details" : seat_data
         }
+        for j in i.seating_details:
+            seat = {
+                "id" : str(j.id),
+                "type_of_seating" : j.type_of_seating,
+                "no_of_seats" : j.no_of_seats,
+                "no_of_row" : j.no_of_row,
+                "seats_number_row_wise": j.seats_number_row_wise
+            }
+            seat_data.append(seat)
         d.append(t_data)
     detail = {
         "id":str(user.id),
@@ -160,23 +180,61 @@ def theatre_details_show(user_id = None):
     data.append(detail)
     return data
 
-def edit_admin_user(user_id):
-    user = admin_user.objects(id=user_id).first()
-    firstname = request.form["firstname"]
-    lastname = request.form["lastname"]
-    password = request.form["password"]
-    mobile_no = request.form["mobile_no"]
-    email = request.form["email"]
-    
-    data = {
-        "firstname" :firstname,
-        "lastname" :lastname,
-        "password" : password,
-        "mobile_no" : mobile_no,
-        "email" : email
-    }
-    
-    for key, value in data.items():
-        if value not in ["null", "undefined", None, ["null"], ""]:
-            admin_user.objects(id=user_id).update(**{"set__" + key: value})
-    return {"mesaage":"your data successfully update"}
+def edit_admin_user(user_id = None,theatre_id=None,seating_id=None):
+    if user_id != None and theatre_id == None:
+        user = admin_user.objects(id=user_id).first()
+        firstname = request.form["firstname"]
+        lastname = request.form["lastname"]
+        password = request.form["password"]
+        mobile_no = request.form["mobile_no"]
+        email = request.form["email"]
+        
+        data = {
+            "firstname" :firstname,
+            "lastname" :lastname,
+            "password" : password,
+            "mobile_no" : mobile_no,
+            "email" : email
+        }
+        
+        for key, value in data.items():
+            if value not in ["null", "undefined", None, ["null"], ""]:
+                admin_user.objects(id=user_id).update(**{"set__" + key: value})
+        return {"mesaage":"your data successfully update"}
+    elif theatre_id != None and seating_id == None:
+        user = admin_user.objects(id=user_id,theatre_details__id=ObjectId(theatre_id)).first()
+        screen_name = request.form["screen_name"]
+        no_of_pathway = request.form["no_of_pathway"]
+        pathway_details = request.form["pathway_details"]
+        data = {
+            "screen_name":str(screen_name),
+            "no_of_pathway":int(no_of_pathway),
+            "pathway_details":str(pathway_details),
+        }
+        for key, value in data.items():
+            if value not in ["null", "undefined", None, ["null"], ""]:
+                admin_user.objects(
+                            id=user_id,
+        theatre_details__id=ObjectId(theatre_id)).update(**{"set__theatre_details__S__" + key: value})
+
+
+        return {"message":"your data successfully update"}
+    elif seating_id and user_id and theatre_id != None:
+        user = admin_user.objects(id=user_id,
+            theatre_details__id=ObjectId(theatre_id),theatre_details__seating_details__id=ObjectId(theatre_id)).first()
+        type_of_seating = request.form["type_of_seating"]
+        no_of_seats = request.form["no_of_seats"]
+        no_of_row = request.form["no_of_row "]
+        seats_number_row_wise = request.form["seats_number_row_wise"]
+        data = {
+            "type_of_seating":type_of_seating,
+            "no_of_seats":no_of_seats,
+            "no_of_row":no_of_row,
+            "seats_number_row_wise":seats_number_row_wise
+        }
+        for key, value in data.items():
+            if value not in ["null", "undefined", None, ["null"], ""]:
+                admin_user.objects(
+                            id=user_id,
+        theatre_details__id=ObjectId(theatre_id),theatre_details__seating_details__id=ObjectId(theatre_id)).update(**{"set__theatre_details____seating_details__S__" + key: value})
+        return {"message":"your data successfully update"}

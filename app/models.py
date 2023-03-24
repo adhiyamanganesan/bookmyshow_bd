@@ -22,11 +22,18 @@ class myuser(Document):
     email = StringField()
     ticket = ListField(EmbeddedDocumentField(ticket_history))
 
+class seat_details(EmbeddedDocument):
+    id = ObjectIdField()
+    type_of_seating = StringField()
+    no_of_seats = IntField()
+    no_of_row = IntField()
+    seats_number_row_wise = StringField()
 class theatre_detail(EmbeddedDocument):
     id = ObjectIdField()
     screen_name=StringField()
-    pathway = StringField()
-    seating_details = ListField()
+    no_of_pathway = IntField()
+    pathway_details = StringField()
+    seating_details = ListField(EmbeddedDocumentField(seat_details))
 
 class admin_user(Document):
     firstname = StringField()
